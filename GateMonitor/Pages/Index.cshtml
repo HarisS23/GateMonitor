@@ -5,7 +5,14 @@
 }
 
 <div class="container mt-4">
-
+    
+    <div class="text-center mb-4">
+        <button 
+            id="machineToggleBtn" 
+            class="btn btn-lg @(Model.IsMachineOn ? "btn-success" : "btn-danger")">
+            @(Model.IsMachineOn ? "Machine ON" : "Machine OFF")
+        </button>
+    </div>
     <div class="text-center mb-4">
         <h1 class="display-4 mb-2">Recent RFID Scans</h1>
         <p class="text-muted">
@@ -120,8 +127,7 @@
             if (!utc) return;
 
             const date = new Date(utc);
-
-            // Format in LOCAL time
+            
             el.textContent = date.toLocaleString([], {
                 year: "numeric",
                 month: "2-digit",
@@ -142,7 +148,6 @@
             date.getFullYear() === now.getFullYear();
 
         if (isToday) {
-            // Today → precise HH:mm:ss (24h)
             return date.toLocaleTimeString([], {
                 hour: "2-digit",
                 minute: "2-digit",
@@ -150,16 +155,14 @@
                 hour12: false
             });
         }
-
-        // Older → dd-MM-yyyy HH:mm (24h)
-        const fullDate = date.toLocaleDateString("en-GB"); // gives DD/MM/YYYY
+        
+        const fullDate = date.toLocaleDateString("en-GB"); 
         const time = date.toLocaleTimeString([], {
             hour: "2-digit",
             minute: "2-digit",
             hour12: false
         });
-
-        // Convert en-GB date (dd/mm/yyyy) into dd-mm-yyyy
+        
         const parts = fullDate.split("/");
         return `${parts[0]}-${parts[1]}-${parts[2]} ${time}`;
     }
@@ -193,8 +196,8 @@
     connection.on("NewRfidScan", record => {
         const tbody = document.querySelector("#rfidTable tbody");
         const tr = document.createElement("tr");
-
-        // Determine action badge
+        const btn = document.getElementById("machineToggleBtn");
+        
         let actionBadge = "";
         if (!record.rfidScanAction) {
             actionBadge = `<span class="badge bg-secondary">Unknown</span>`;
@@ -204,22 +207,24 @@
             switch(record.rfidScanAction) {
                 case "Turned On":
                     actionBadge = `<span class="badge bg-success">Machine Turned On</span>`;
+                    btn.textContent = "Machine ON";
+                    btn.className = "btn btn-success btn-lg";
                     break;
                 case "Turned Off":
                     actionBadge = `<span class="badge bg-danger">Machine Turned Off</span>`;
+                    btn.textContent = "Machine OFF";
+                    btn.className = "btn btn-danger btn-lg";
                     break;
                 default:
                     actionBadge = `<span class="badge bg-secondary">${record.rfidScanAction}</span>`;
                     break;
             }
         }
-
-        // Determine success badge
+        
         const successBadge = record.success
             ? `<span class="badge bg-success">SUCCESS</span>`
             : `<span class="badge bg-danger">FAILED</span>`;
-
-        // Build table row
+            
         tr.innerHTML = `
             <td>${record.id}</td>
             <td>${record.worker?.firstName ?? ""} ${record.worker?.lastName ?? ""}</td>
@@ -230,10 +235,26 @@
         `;
 
         tbody.prepend(tr);
-        updateTimestamps(); // refresh timestamps
+        updateTimestamps();
     });
 </script>
+<script>
+    document.getElementById("machineToggleBtn").addEventListener("click", async () => {
+        const response = await fetch("/api/machine/toggle", { method: "POST" });
+        const data = await response.json();
+        
+        console.log("Machine state updated:", data);
 
+        const btn = document.getElementById("machineToggleBtn");
+        if (data.isOn) {
+            btn.textContent = "Machine ON";
+            btn.className = "btn btn-success btn-lg";
+        } else {
+            btn.textContent = "Machine OFF";
+            btn.className = "btn btn-danger btn-lg";
+        }
+    });
+</script>
 
 
 

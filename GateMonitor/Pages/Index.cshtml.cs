@@ -1,5 +1,6 @@
 using GateMonitor.Data;
 using GateMonitor.Models;
+using GateMonitor.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -18,6 +19,7 @@ namespace GateMonitor.Pages
             _logger = logger;
             _dbContext = dbContext;
         }
+        public bool IsMachineOn { get; private set; }
 
         [BindProperty] 
         public List<RfidScanRecord> RfidRecords { get; set; }
@@ -27,6 +29,8 @@ namespace GateMonitor.Pages
 
         public async Task OnGet(int pageNumber = 1)
         {
+            IsMachineOn = MachineStateService.IsMachineOn; 
+
             PageNumber = pageNumber;
 
             var totalRecords = await _dbContext.RfidScanRecords.CountAsync();

@@ -7,7 +7,7 @@ namespace GateMonitor.Models
     {
         [Key]
         public int Id { get; set; }
-        [Required]
+        [Required, ForeignKey(nameof(RfidCard))]
         public string RfidUid { get; set; } = null!;
         [ForeignKey(nameof(Worker))]
         public int? WorkerId { get; set; }

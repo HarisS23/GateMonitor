@@ -11,7 +11,7 @@ namespace GateMonitor.Models
         public string FirstName { get; set; } = null!;
         [Required]
         public string LastName { get; set; } = null!;
-        [Required]
+        [Required, ForeignKey(nameof(RfidCard))]
         public string RfidUid { get; set; } = null!;
         [Required]
         public bool HasAccess { get; set; }

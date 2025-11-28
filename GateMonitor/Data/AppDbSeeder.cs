@@ -21,6 +21,20 @@ namespace GateMonitor.Data
                         CreatedAt = DateTime.UtcNow
                     }
                 );
+
+                await db.SaveChangesAsync();
+            }
+
+            if (!await db.RfidCards.AnyAsync())
+            {
+                await db.RfidCards.AddAsync(
+                new RfidCard
+                {
+                    Uid = "admin",
+                    CreatedAt = DateTime.UtcNow
+                });
+
+                await db.SaveChangesAsync();
             }
 
             if (!await db.RfidScanActions.AnyAsync())

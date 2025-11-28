@@ -13,6 +13,7 @@ namespace GateMonitor.Data
         public DbSet<User> Users { get; set; }
         public DbSet<RfidScanRecord> RfidScanRecords { get; set; }
         public DbSet<RfidScanAction> RfidScanActions { get; set; }
+        public DbSet<RfidCard> RfidCards { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -30,6 +31,11 @@ namespace GateMonitor.Data
                 .HasIndex(w => w.RfidUid)
                 .IsUnique();
 
+            modelBuilder.Entity<Worker>()
+                .HasOne<RfidCard>()
+                .WithOne()
+                .HasForeignKey<Worker>(w => w.RfidUid);
+
             modelBuilder.Entity<RfidScanRecord>()
                 .HasOne(r => r.Worker)
                 .WithMany(w => w.RfidScanRecords)
@@ -39,6 +45,12 @@ namespace GateMonitor.Data
             modelBuilder.Entity<RfidScanRecord>()
                 .Property(r => r.Id)
                 .ValueGeneratedOnAdd();
+
+            modelBuilder.Entity<RfidScanRecord>()
+                .HasOne<RfidCard>()              
+                .WithMany()                       
+                .HasForeignKey(r => r.RfidUid)    
+                .OnDelete(DeleteBehavior.NoAction);
         }
     }
 }

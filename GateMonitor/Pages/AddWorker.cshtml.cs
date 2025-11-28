@@ -3,6 +3,7 @@ using GateMonitor.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.EntityFrameworkCore;
 
 namespace GateMonitor.Pages
 {
@@ -31,6 +32,17 @@ namespace GateMonitor.Pages
             }
             NewWorker.HasAccess = true;
             NewWorker.CreatedAt = DateTime.UtcNow;
+
+            var rfidCard = await _dbContext.RfidCards.FirstOrDefaultAsync(rc => rc.Uid == NewWorker.RfidUid);
+
+            if (rfidCard == null)
+            {
+                _dbContext.RfidCards.Add(new RfidCard
+                {
+                    Uid = NewWorker.RfidUid,
+                    CreatedAt = DateTime.UtcNow
+                });
+            }
 
             _dbContext.Workers.Add(NewWorker);
             await _dbContext.SaveChangesAsync();
