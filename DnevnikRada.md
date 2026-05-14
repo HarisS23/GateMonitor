@@ -1,9 +1,8 @@
 # 📋 Dnevnik Rada – GateMonitor
 
 > **Projekat:** GateMonitor – IoT sistem za kontrolu pristupa industrijskim mašinama  
-> **Autor:** [Ime i prezime / Naziv tima]  
+> **Autor:** Haris Sejmenović
 > **Period implementacije:** 16. novembar – 22. novembar 2025.  
-> **Repozitorij:** [link ka GitHub repozitoriju]
 
 ---
 
